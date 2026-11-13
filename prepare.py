@@ -1,13 +1,10 @@
-
 import torch
-from torch.utils.data import Dataset, DataLoader
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from torch.utils.data import DataLoader, Dataset
 
-from bikes_data import make_rentals, TARGET
-
+from bikes_data import TARGET, make_rentals
 
 # 1. Define features
 NUMERIC = [

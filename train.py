@@ -1,4 +1,3 @@
-
 """Lab 07: train PyTorch networks, compare baselines, save reproducible reports.
 
 Requires the Part 1-3 files: bikes_data.py, prepare.py, and model.py.
@@ -27,6 +26,7 @@ REPORTS = Path(__file__).resolve().parent / "reports"
 # ============================================================
 # 1. TRAIN OR VALIDATE FOR ONE EPOCH
 # ============================================================
+
 
 def run_epoch(model, loader, loss_fn, optimizer=None):
     """Train for one epoch if an optimizer is supplied; otherwise only measure."""
@@ -59,6 +59,7 @@ def run_epoch(model, loader, loss_fn, optimizer=None):
 # 2. VERIFY THAT THE NETWORK CAN LEARN
 # ============================================================
 
+
 def check_small_batch(dataset, n_features):
     """Confirm that the network and optimizer can learn a tiny set of rows."""
     torch.manual_seed(123)
@@ -87,6 +88,7 @@ def check_small_batch(dataset, n_features):
 # 3. TRAIN THE MODEL FOR MULTIPLE EPOCHS
 # ============================================================
 
+
 def train_model(model, train_loader, val_loader, epochs, learning_rate):
     """Log every epoch and restore weights from lowest validation MSE."""
     loss_fn = nn.MSELoss()
@@ -97,13 +99,9 @@ def train_model(model, train_loader, val_loader, epochs, learning_rate):
     history = []
 
     for epoch in range(1, epochs + 1):
-        train_loss, train_mae = run_epoch(
-            model, train_loader, loss_fn, optimizer
-        )
+        train_loss, train_mae = run_epoch(model, train_loader, loss_fn, optimizer)
 
-        val_loss, val_mae = run_epoch(
-            model, val_loader, loss_fn
-        )
+        val_loss, val_mae = run_epoch(model, val_loader, loss_fn)
 
         history.append(
             {
@@ -138,6 +136,7 @@ def train_model(model, train_loader, val_loader, epochs, learning_rate):
 # ============================================================
 # 4. GENERATE LEARNING CURVES
 # ============================================================
+
 
 def save_curves(history, best_epoch, destination, title):
     """Save training/validation MSE against epoch and mark best epoch."""
@@ -178,6 +177,7 @@ def save_curves(history, best_epoch, destination, title):
 # 5. GENERATE PREDICTIONS AND CALCULATE MAE
 # ============================================================
 
+
 def predict_rentals(model, dataset):
     """Get predictions in rental units without computing gradients."""
     model.eval()
@@ -193,6 +193,7 @@ def mae(truth, predictions):
 # ============================================================
 # 6. MAIN TRAINING AND EVALUATION PROCESS
 # ============================================================
+
 
 def main():
     torch.set_num_threads(1)
@@ -255,9 +256,7 @@ def main():
         # Reset seeds for repeatable comparisons
         torch.manual_seed(SEED)
 
-        train_loader, val_loader, _ = make_loaders(
-            data, seed=SEED
-        )
+        train_loader, val_loader, _ = make_loaders(data, seed=SEED)
 
         model = BikeNet(
             n_features,
@@ -272,37 +271,23 @@ def main():
             learning_rate=config["learning_rate"],
         )
 
-        best_row = history.loc[
-            history["epoch"] == best_epoch
-        ].iloc[0]
+        best_row = history.loc[history["epoch"] == best_epoch].iloc[0]
 
         experiment_rows.append(
             {
                 **config,
                 "best_epoch_by_val_loss": int(best_epoch),
-                "best_validation_loss": float(
-                    best_row["val_loss"]
-                ),
-                "val_mae_at_best_epoch": float(
-                    best_row["val_mae"]
-                ),
-                "lowest_val_mae_seen": float(
-                    history["val_mae"].min()
-                ),
-                "final_train_loss": float(
-                    history.iloc[-1]["train_loss"]
-                ),
-                "final_val_loss": float(
-                    history.iloc[-1]["val_loss"]
-                ),
+                "best_validation_loss": float(best_row["val_loss"]),
+                "val_mae_at_best_epoch": float(best_row["val_mae"]),
+                "lowest_val_mae_seen": float(history["val_mae"].min()),
+                "final_train_loss": float(history.iloc[-1]["train_loss"]),
+                "final_val_loss": float(history.iloc[-1]["val_loss"]),
             }
         )
 
         # Generate learning curves
         filename = (
-            "learning_curves.png"
-            if name == "main"
-            else f"learning_curves_{name}.png"
+            "learning_curves.png" if name == "main" else f"learning_curves_{name}.png"
         )
 
         save_curves(
@@ -359,9 +344,7 @@ def main():
     training_mean = float(y_train.mean())
 
     # Baseline 2: Linear regression
-    linear_model = LinearRegression().fit(
-        x_train, y_train
-    )
+    linear_model = LinearRegression().fit(x_train, y_train)
 
     # Validation comparisons
     baseline_val = {
@@ -410,9 +393,7 @@ def main():
 
     metrics = {
         "selected_experiment": winner["name"],
-        "selection_rule": (
-            "lowest validation MAE at best validation-loss epoch"
-        ),
+        "selection_rule": ("lowest validation MAE at best validation-loss epoch"),
         "split_sizes": {
             "train": len(y_train),
             "val": len(y_val),
@@ -430,18 +411,12 @@ def main():
         "network": {
             "validation_mae": network_val,
             "test_mae": network_test,
-            "best_epoch_by_val_loss": winner[
-                "best_epoch_by_val_loss"
-            ],
-            "best_validation_loss": winner[
-                "best_validation_loss"
-            ],
+            "best_epoch_by_val_loss": winner["best_epoch_by_val_loss"],
+            "best_validation_loss": winner["best_validation_loss"],
         },
     }
 
-    with (
-        REPORTS / "metrics.json"
-    ).open("w", encoding="utf-8") as file:
+    with (REPORTS / "metrics.json").open("w", encoding="utf-8") as file:
         json.dump(metrics, file, indent=2)
 
     # --------------------------------------------------------
@@ -449,9 +424,7 @@ def main():
     # --------------------------------------------------------
 
     print("\nFINAL MAE (bikes rented)")
-    print(
-        f"{'Model':<20} {'Validation':>12} {'Test':>12}"
-    )
+    print(f"{'Model':<20} {'Validation':>12} {'Test':>12}")
 
     for name in (
         "training_mean",
